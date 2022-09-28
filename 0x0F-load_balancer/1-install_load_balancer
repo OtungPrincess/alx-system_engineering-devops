@@ -5,7 +5,7 @@ add-apt-repository -y ppa:vbernat/haproxy-2.6
 apt-get -y install haproxy=2.6.\*
 apt-get -y update
 
-sed -i "/127.0.0.1 localhost/a 3.236.236.94 8871-lb-01\n44.211.31.180 8871-web-01\n44.210.77.98 8871-web-02" /etc/hosts
+sed -i "/127.0.0.1 localhost/a 100.26.140.207 19470-lb-01\n34.239.163.194 19470-web-01\n3.85.222.35 19470-web-02" /etc/hosts
 {
 	echo -e "# HAproxy for web servers"
 	echo -e "frontend web_frontend"
