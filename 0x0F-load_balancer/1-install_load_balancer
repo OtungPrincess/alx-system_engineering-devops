@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
-#install haproxy as load balancer and configure it
+# Installing HAproxy load balancer
+apt-get -y install --no-install-recommends software-properties-common
+add-apt-repository -y ppa:vbernat/haproxy-2.6
+apt-get -y install haproxy=2.6.\*
+apt-get -y update
 
-sudo apt-get -y update
-sudo apt-get -y install haproxy
-sudo sed -i 's/ENABLED=0/ENABLED=1/' /etc/default/haproxy
-sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.original
-echo -e "\nfrontend http\n\tbind *:80\n\tmode http\n\tdefault_backend web-backend\n\nbackend web-backend\n\tbalance roundrobin\n\tserver 19470-web-01 34.239.163.194:80 check\n\tserver 19470-web-02 3.85.222.35:80 check" >> /etc/haproxy/haproxy.cfg 
-sudo service haproxy restart
+sed -i "/127.0.0.1 localhost/a 3.236.236.94 8871-lb-01\n44.211.31.180 8871-web-01\n44.210.77.98 8871-web-02" /etc/hosts
+{
+	echo -e "# HAproxy for web servers"
+	echo -e "frontend web_frontend"
+	echo -e "\tbind *:80"
+	echo -e "\tmode http"
+	echo -e "\tdefault_backend web_backend"
+	echo -e "\nbackend web_backend"
+	echo -e "\tbalance roundrobin"
+	echo -e "\tserver 19470-web-01 34.239.163.194:80 check"
+	echo -e "\tserver 19470-web-02 3.85.222.35:80 check"
+} >> /etc/haproxy/haproxy.cfg
+service haproxy restart
