@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
-# Installing HAproxy load balancer
-apt-get -y install --no-install-recommends software-properties-common
-add-apt-repository -y ppa:vbernat/haproxy-2.6
-apt-get -y install haproxy=2.6.\*
+# Configures a new Ubuntu server with a HAproxy load-balancer
+apt-get -y install software-properties-common
+add-apt-repository -y ppa:vbernat/haproxy-1.8
 apt-get -y update
-
-sed -i "/127.0.0.1 localhost/a 100.26.140.207 19470-lb-01\n34.239.163.194 19470-web-01\n3.85.222.35 19470-web-02" /etc/hosts
-{
-	echo -e "# HAproxy for web servers"
-	echo -e "frontend web_frontend"
-	echo -e "\tbind *:80"
-	echo -e "\tmode http"
-	echo -e "\tdefault_backend web_backend"
-	echo -e "\nbackend web_backend"
-	echo -e "\tbalance roundrobin"
-	echo -e "\tserver 19470-web-01 34.239.163.194:80 check"
-	echo -e "\tserver 19470-web-02 3.85.222.35:80 check"
-} >> /etc/haproxy/haproxy.cfg
-service haproxy restart
+apt-get -y install haproxy=1.8.\*
+sed -i '/errorfile 504/a listen otungp' /etc/haproxy/haproxy.cfg
+sed -i '/listen otungp/a         bind :80' /etc/haproxy/haproxy.cfg
+sed -i '/bind :80/a         mode http' /etc/haproxy/haproxy.cfg
+sed -i '/mode http/a         server 19470-web-01 34.239.163.194:80 check' /etc/haproxy/haproxy.cfg
+sed -i '/server 19470-web-01 34.239.163.194:80 check/a         server 19470-web-02 3.85.222.35:80 check' /etc/haproxy/haproxy.cfg
+sed -i '/#EXTRAOPTS="-de -m 16"/a ENABLED=1' /etc/default/haproxy
+service haproxy start
